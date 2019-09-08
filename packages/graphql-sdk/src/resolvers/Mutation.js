@@ -10,6 +10,7 @@ const BN = require('bn.js')
 type GQLContext = {
   livepeer: Object,
   account?: string,
+  returnTxHash: boolean,
 }
 
 type MutationObj = {}
@@ -64,6 +65,7 @@ export async function bond(
   ])
   return await ctx.livepeer.rpc.bondApprovedTokenAmount(to, amount, {
     gas: gas,
+    returnTxHash: ctx.returnTxHash ? ctx.returnTxHash : false,
   })
 }
 

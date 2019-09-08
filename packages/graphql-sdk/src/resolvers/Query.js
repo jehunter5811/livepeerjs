@@ -372,3 +372,21 @@ export async function protocol(
   const protocol = await ctx.livepeer.rpc.getProtocol()
   return protocol
 }
+
+/**
+ * Gets a transaction receipt by its block hash
+ * @param {QueryObj} obj
+ * @param {QueryAccountArgs} args
+ * @param {GQLContext} ctx
+ * @return {Transaction}
+ */
+export async function transaction(
+  obj: QueryObj,
+  args: QueryProtocolArgs,
+  ctx: GQLContext,
+): Transaction {
+  const { config, rpc, utils } = ctx.livepeer
+  const { eth } = config
+  const transaction = await utils.getTxReceipt(args.id, eth)
+  return transaction
+}

@@ -1934,24 +1934,27 @@ export async function createLivepeerSDK(
       )
     },
 
+    // TODO: check for existing approval / round initialization / token balance
     async bondApprovedTokenAmount(
       to: string,
       amount: string,
       tx: TxObject,
     ): Promise<TxReceipt> {
       const token = toBN(amount)
-      // TODO: check for existing approval / round initialization / token balance
-      return await utils.getTxReceipt(
-        await BondingManager.bond(
-          token,
-          await resolveAddress(rpc.getENSAddress, to),
-          {
-            ...config.defaultTx,
-            ...tx,
-          },
-        ),
-        config.eth,
+      let txHash = await BondingManager.bond(
+        token,
+        await resolveAddress(rpc.getENSAddress, to),
+        {
+          ...config.defaultTx,
+          ...tx,
+        },
       )
+
+      if (tx.returnTxHash) {
+        return txHash
+      }
+
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**

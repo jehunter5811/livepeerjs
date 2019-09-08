@@ -64,6 +64,9 @@ type Query {
 
   "An unbond lock for an account"
   unbondlock(id: String!, lockId: String!): UnbondLock!
+
+  "A transaction receipt"
+  transaction(id: String!): Transaction!
 }`
 
 export default () => [
