@@ -39,6 +39,7 @@ export async function approve(
       )
       return await ctx.livepeer.rpc.approveTokenBondAmount(amount, {
         gas: gas,
+        returnTxHash: ctx.returnTxHash ? ctx.returnTxHash : false,
       })
       break
     default:
@@ -91,7 +92,11 @@ export async function claimEarnings(
   const txHash = await ctx.livepeer.rpc.claimEarnings(endRound, {
     gas: gas,
   })
-  console.log(txHash)
+
+  if (ctx.returnTxHash) {
+    return txHash
+  }
+
   const mockTx = {
     blockNumber: '',
     blockHash: '',
@@ -143,13 +148,16 @@ export async function sendTransaction(
 ): Promise<TxReceipt> {
   const { utils, config } = ctx.livepeer
   const { eth, defaultTx } = config
-  return await utils.getTxReceipt(
-    await eth.sendTransaction({
-      ...defaultTx,
-      ...args.options,
-    }),
-    eth,
-  )
+  const txHash = await eth.sendTransaction({
+    ...defaultTx,
+    ...args.options,
+  })
+
+  if (ctx.returnTxHash) {
+    return txHash
+  }
+
+  return await utils.getTxReceipt(txHash, eth)
 }
 
 /**
@@ -166,6 +174,7 @@ export async function unbond(
 
   return await ctx.livepeer.rpc.unbond(amount, {
     ...ctx.livepeer.config.defaultTx,
+    returnTxHash: ctx.returnTxHash ? ctx.returnTxHash : false,
   })
 }
 
@@ -188,6 +197,7 @@ export async function rebond(
   return await ctx.livepeer.rpc.rebond(unbondingLockId, {
     ...ctx.livepeer.config.defaultTx,
     gas: gas,
+    returnTxHash: ctx.returnTxHash ? ctx.returnTxHash : false,
   })
 }
 
@@ -211,6 +221,7 @@ export async function rebondFromUnbonded(
 
   return await ctx.livepeer.rpc.rebondFromUnbonded(delegate, unbondingLockId, {
     gas: gas,
+    returnTxHash: ctx.returnTxHash ? ctx.returnTxHash : false,
   })
 }
 
@@ -231,5 +242,6 @@ export async function initializeRound(
   )
   return await ctx.livepeer.rpc.initializeRound({
     gas,
+    returnTxHash: ctx.returnTxHash ? ctx.returnTxHash : false,
   })
 }

@@ -1288,13 +1288,20 @@ export async function createLivepeerSDK(
       unbondingLockId: number,
       tx = config.defaultTx,
     ): Promise<TxReceipt> {
-      return await utils.getTxReceipt(
-        await BondingManager.rebondFromUnbonded(addr, unbondingLockId, {
+      const txHash = await BondingManager.rebondFromUnbonded(
+        addr,
+        unbondingLockId,
+        {
           ...config.defaultTx,
           ...tx,
-        }),
-        config.eth,
+        },
       )
+
+      if (tx.returnTxHash) {
+        return txHash
+      }
+
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**
@@ -1919,19 +1926,25 @@ export async function createLivepeerSDK(
       })
     },
 
+    // TODO: - check token balance
     async approveTokenBondAmount(
       amount: string,
       tx: TxObject,
     ): Promise<TxReceipt> {
       const token = toBN(amount)
-      // TODO: - check token balance
-      await utils.getTxReceipt(
-        await LivepeerToken.approve(BondingManager.address, token, {
+      const txHash = await LivepeerToken.approve(
+        BondingManager.address,
+        token,
+        {
           ...config.defaultTx,
           ...tx,
-        }),
-        config.eth,
+        },
       )
+      if (tx.returnTxHash) {
+        return txHash
+      }
+
+      await utils.getTxReceipt(txHash, config.eth)
     },
 
     // TODO: check for existing approval / round initialization / token balance
@@ -1941,7 +1954,7 @@ export async function createLivepeerSDK(
       tx: TxObject,
     ): Promise<TxReceipt> {
       const token = toBN(amount)
-      let txHash = await BondingManager.bond(
+      const txHash = await BondingManager.bond(
         token,
         await resolveAddress(rpc.getENSAddress, to),
         {
@@ -2061,13 +2074,16 @@ export async function createLivepeerSDK(
 
       tx.gas = await rpc.estimateGas('BondingManager', 'unbond', [amount])
 
-      return await utils.getTxReceipt(
-        await BondingManager.unbond(amount, {
-          ...config.defaultTx,
-          ...tx,
-        }),
-        config.eth,
-      )
+      const txHash = await BondingManager.unbond(amount, {
+        ...config.defaultTx,
+        ...tx,
+      })
+
+      if (tx.returnTxHash) {
+        return txHash
+      }
+
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**
