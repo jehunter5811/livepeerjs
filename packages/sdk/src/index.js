@@ -1245,13 +1245,16 @@ export async function createLivepeerSDK(
       unbondingLockId: string,
       tx = config.defaultTx,
     ): Promise<TxReceipt> {
-      return await utils.getTxReceipt(
-        await BondingManager.rebond(unbondingLockId, {
-          ...config.defaultTx,
-          ...tx,
-        }),
-        config.eth,
-      )
+      const txHash = await BondingManager.rebond(unbondingLockId, {
+        ...config.defaultTx,
+        ...tx,
+      })
+
+      if (tx.returnTxHash) {
+        return txHash
+      }
+
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**
@@ -1893,11 +1896,11 @@ export async function createLivepeerSDK(
      */
     async initializeRound(tx = config.defaultTx): Promise<TxReceipt> {
       try {
-        // initialize round
-        return await utils.getTxReceipt(
-          await RoundsManager.initializeRound(tx),
-          config.eth,
-        )
+        const txHash = await RoundsManager.initializeRound(tx)
+        if (tx.returnTxHash) {
+          return txHash
+        }
+        return await utils.getTxReceipt(txHash, config.eth)
       } catch (err) {
         err.message = 'Error: initializeRound\n' + err.message
         throw err
@@ -1944,7 +1947,7 @@ export async function createLivepeerSDK(
         return txHash
       }
 
-      await utils.getTxReceipt(txHash, config.eth)
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     // TODO: check for existing approval / round initialization / token balance
