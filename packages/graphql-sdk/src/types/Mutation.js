@@ -4,16 +4,16 @@ const Mutation = `
 type Mutation {
 
   "Approve an amount for an ERC20 token transfer"
-  approve(type: String!, amount: String!): Boolean
+  approve(type: String!, amount: String!): JSON
 
   "Submits a bond transaction for a previously approved amount"
   bond(to: String!, amount: String!): JSON
 
   "Claims earnings from your last claim round through specified round"
-  claimEarnings(endRound: String!): Boolean
+  claimEarnings(endRound: String!): JSON
 
   "Sends a transaction based on an input object"
-  sendTransaction(options: JSON!): Boolean
+  sendTransaction(options: JSON!): JSON
 
   "Submits a bond transaction for a previously approved amount"
   unbond(amount: String!): JSON
