@@ -202,6 +202,31 @@ export async function rebond(
 }
 
 /**
+ * Submits a withdrawStake transaction
+ * @param {MutationObj} obj
+ * @return {Promise<TxReceipt>}
+ */
+export async function withdrawStake(
+  obj: MutationObj,
+  args,
+  ctx: GQLContext,
+): Promise<TxReceipt> {
+  const { unbondingLockId } = args
+
+  const gas = await ctx.livepeer.rpc.estimateGas(
+    'BondingManager',
+    'withdrawStake',
+    [unbondingLockId],
+  )
+
+  return await ctx.livepeer.rpc.withdrawStake(unbondingLockId, {
+    ...ctx.livepeer.config.defaultTx,
+    gas: gas,
+    returnTxHash: ctx.returnTxHash ? ctx.returnTxHash : false,
+  })
+}
+
+/**
  * Submits a rebondFromUnbonded transaction
  * @param {MutationObj} obj
  * @return {Promise<TxReceipt>}
