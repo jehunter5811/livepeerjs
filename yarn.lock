@@ -157,10 +157,10 @@
     striptags "^3.0.1"
     word-wrap "^1.2.1"
 
-"@adamsoffer/livepeer-graphql-sdk@^1.0.0-alpha.8":
-  version "1.0.0-alpha.8"
-  resolved "https://registry.yarnpkg.com/@adamsoffer/livepeer-graphql-sdk/-/livepeer-graphql-sdk-1.0.0-alpha.8.tgz#1885f3b047350aa097c1d30c572f14c61a5411c9"
-  integrity sha512-z8osYkKK7rgD2pTL1ZF/ri4cREeMqAAdkPGXcNq+pVQIanzqj3yGyI97Aw6kdw4/VlJsCWKzkYv49ch8nC0uRA==
+"@adamsoffer/livepeer-graphql-sdk@^1.0.0-alpha.9":
+  version "1.0.0-alpha.9"
+  resolved "https://registry.yarnpkg.com/@adamsoffer/livepeer-graphql-sdk/-/livepeer-graphql-sdk-1.0.0-alpha.9.tgz#f49095b8dad708593c9439526e50d87d84ea62fa"
+  integrity sha512-DuAmpECDoUi7EN14xIo2IPUSPm4SvSIJU+4DobI6qocj54TyGOV25FBlQr+JW3cYXzJiOnQL5fPaRpmS3q2YCA==
   dependencies:
     "@livepeer/sdk" "1.0.0-alpha.6"
     bn "^1.0.1"
