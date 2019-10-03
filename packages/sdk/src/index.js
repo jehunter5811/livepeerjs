@@ -2301,10 +2301,14 @@ export async function createLivepeerSDK(
         if (unbondingLockId.cmp(new BN(0)) > 0) {
           unbondingLockId = unbondingLockId.sub(new BN(1))
         }
-        return await utils.getTxReceipt(
-          await BondingManager.withdrawStake(toString(unbondingLockId), tx),
-          config.eth,
+        const txHash = await BondingManager.withdrawStake(
+          toString(unbondingLockId),
+          tx,
         )
+        if (tx.returnTxHash) {
+          return txHash
+        }
+        return await utils.getTxReceipt(txHash, config.eth)
       }
     },
 
@@ -2357,11 +2361,14 @@ export async function createLivepeerSDK(
       }
 
       let unbondingLockId = toBN(id)
-
-      return await utils.getTxReceipt(
-        await BondingManager.withdrawStake(toString(unbondingLockId), tx),
-        config.eth,
+      const txHash = await BondingManager.withdrawStake(
+        toString(unbondingLockId),
+        tx,
       )
+      if (tx.returnTxHash) {
+        return txHash
+      }
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**

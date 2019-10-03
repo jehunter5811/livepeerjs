@@ -211,7 +211,7 @@ export async function withdrawStake(
   args,
   ctx: GQLContext,
 ): Promise<TxReceipt> {
-  const { unbondingLockId } = args
+  const { unbondingLockId, amount, withdrawRound } = args
 
   const gas = await ctx.livepeer.rpc.estimateGas(
     'BondingManager',
@@ -219,11 +219,14 @@ export async function withdrawStake(
     [unbondingLockId],
   )
 
-  return await ctx.livepeer.rpc.withdrawStake(unbondingLockId, {
-    ...ctx.livepeer.config.defaultTx,
-    gas: gas,
-    returnTxHash: ctx.returnTxHash ? ctx.returnTxHash : false,
-  })
+  return await ctx.livepeer.rpc.withdrawStakeWithUnbondLock(
+    { unbondingLockId, amount, withdrawRound },
+    {
+      ...ctx.livepeer.config.defaultTx,
+      gas: gas,
+      returnTxHash: ctx.returnTxHash ? ctx.returnTxHash : false,
+    },
+  )
 }
 
 /**
