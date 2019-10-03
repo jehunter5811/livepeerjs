@@ -169,10 +169,10 @@
     graphql-tools "^4.0.4"
     graphql-type-json "^0.3.0"
 
-"@adamsoffer/livepeer-sdk@^1.0.0-alpha.12":
-  version "1.0.0-alpha.12"
-  resolved "https://registry.yarnpkg.com/@adamsoffer/livepeer-sdk/-/livepeer-sdk-1.0.0-alpha.12.tgz#7e48d6fa30c46468d1c326fb8d5bd2b8a4d63dad"
-  integrity sha512-UhvoIPx1EWh1lH0RW5ewFsfqPG857MOAvxUzs0QHc5/KbNvgTmWe7D8KMfThPxOQmma4S7QSk0EFb2RDsOKnSw==
+"@adamsoffer/livepeer-sdk@^1.0.0-alpha.13":
+  version "1.0.0-alpha.14"
+  resolved "https://registry.yarnpkg.com/@adamsoffer/livepeer-sdk/-/livepeer-sdk-1.0.0-alpha.14.tgz#deaf4919f90cdae29c2f9b4cc51a63fa79b1218f"
+  integrity sha512-sbejE9NbgD/9CG1iavNXXB8mPUhZ+0r3rKMBMtzFZF1dIT/eVyBVrjTwq96CnQ0Y5+fKQdTLRzSvwAFBHIT24w==
   dependencies:
     "@babel/runtime" "^7.4.3"
     cross-env "^5.2.0"
