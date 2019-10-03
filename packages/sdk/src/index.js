@@ -2051,8 +2051,6 @@ export async function createLivepeerSDK(
      * // }
      */
     async unbond(amount: string, tx = config.defaultTx): Promise<TxReceipt> {
-      tx.gas = await rpc.estimateGas('BondingManager', 'unbond', [amount])
-
       const txHash = await BondingManager.unbond(amount, {
         ...config.defaultTx,
         ...tx,
