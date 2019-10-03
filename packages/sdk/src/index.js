@@ -2283,33 +2283,19 @@ export async function createLivepeerSDK(
      * // }
      */
     async withdrawStake(
+      unbondingLockId: string,
       tx = config.defaultTx,
-      unbondingLockId = null,
     ): Promise<TxReceipt> {
-      const {
-        status,
-        withdrawAmount,
-        nextUnbondingLockId,
-      } = await rpc.getDelegator(tx.from)
+      const txHash = await BondingManager.withdrawStake(unbondingLockId, {
+        ...config.defaultTx,
+        ...tx,
+      })
 
-      if (status === DELEGATOR_STATUS.Unbonding && !unbondingLockId) {
-        throw new Error('Delegator must wait through unbonding period')
-      } else if (withdrawAmount === '0') {
-        throw new Error('Delegator does not have anything to withdraw')
-      } else {
-        unbondingLockId = toBN(nextUnbondingLockId)
-        if (unbondingLockId.cmp(new BN(0)) > 0) {
-          unbondingLockId = unbondingLockId.sub(new BN(1))
-        }
-        const txHash = await BondingManager.withdrawStake(
-          toString(unbondingLockId),
-          tx,
-        )
-        if (tx.returnTxHash) {
-          return txHash
-        }
-        return await utils.getTxReceipt(txHash, config.eth)
+      if (tx.returnTxHash) {
+        return txHash
       }
+
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**
