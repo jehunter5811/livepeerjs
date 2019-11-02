@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useWeb3Context } from 'web3-react'
 import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'

@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx, Styled, Flex } from 'theme-ui'
-import React from 'react'
+import React, { useState } from 'react'
 import Head from 'next/head'
 import Drawer from '../components/Drawer'
 import Reset from '../lib/reset'
@@ -11,17 +11,22 @@ import Search from '../static/img/search.svg'
 import { useWeb3Context } from 'web3-react'
 import { ethers } from 'ethers'
 
-export default ({ children, title = 'Livepeer Explorer' }) => {
+const Layout = ({ children, title = 'Livepeer Explorer' }) => {
   const context = useWeb3Context()
-
   const { account } = context
 
   let items = [
-    { name: 'Orchestrators', href: '/', icon: Orchestrators },
+    {
+      name: 'Orchestrators',
+      href: '/',
+      icon: Orchestrators,
+      className: 'orchestrators',
+    },
     {
       name: 'Search',
       href: '/search',
       icon: Search,
+      className: 'search',
     },
     {
       name: !account ? (
@@ -34,6 +39,7 @@ export default ({ children, title = 'Livepeer Explorer' }) => {
           </div>
         </div>
       ),
+      className: 'connectWallet',
       href: !account ? '/connect-wallet' : '/accounts/[account]/[slug]',
       as: !account ? '/connect-wallet' : `/accounts/${account}/staking`,
       icon: !account ? Wallet : Account,
@@ -84,3 +90,7 @@ export default ({ children, title = 'Livepeer Explorer' }) => {
     </>
   )
 }
+
+export const getLayout = page => <Layout>{page}</Layout>
+
+export default Layout

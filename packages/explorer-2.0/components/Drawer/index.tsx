@@ -1,15 +1,28 @@
 /** @jsx jsx */
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { jsx, Flex, Box } from 'theme-ui'
 import Logo from '../../static/img/logo.svg'
+import LPT from '../../static/img/lpt.svg'
+import New from '../../static/img/new.svg'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import Router, { useRouter } from 'next/router'
 import { useWeb3Context } from 'web3-react'
+import StakingGuide from '../StakingGuide'
+import Modal from '../Modal'
 
 export default ({ items = [] }) => {
   const router = useRouter()
-  const { asPath } = router
+  const { query, pathname, asPath } = router
   const context = useWeb3Context()
+  const [open, setOpen] = useState(query && query.openExchange ? true : false)
+
+  useEffect(() => {
+    if (query && query.openExchange) {
+      setOpen(true)
+    } else {
+      setOpen(false)
+    }
+  })
 
   return (
     <Flex
@@ -39,6 +52,7 @@ export default ({ items = [] }) => {
             flexDirection: 'column',
             width: '100%',
             height: '100%',
+            pr: 4,
           }}
         >
           <Logo sx={{ mb: 3 }} />
@@ -51,6 +65,7 @@ export default ({ items = [] }) => {
                 passHref
               >
                 <a
+                  className={item.className ? item.className : ''}
                   sx={{
                     color:
                       asPath === (item.as ? item.as : item.href) ||
@@ -79,11 +94,65 @@ export default ({ items = [] }) => {
                 </a>
               </Link>
             ))}
+            <StakingGuide>Staking Guide</StakingGuide>
           </Box>
           <div sx={{ mb: 3 }}>
-            <Link href="/whats-new" passHref>
-              <a sx={{ fontSize: 1, color: 'text' }}>🌟What's New</a>
-            </Link>
+            <div sx={{ mb: 2 }}>
+              <Link href="/whats-new" passHref>
+                <a
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 1,
+                    color: 'muted',
+                  }}
+                >
+                  <New
+                    sx={{ color: 'inherit', width: 20, height: 20, mr: 1 }}
+                  />
+                  What's New
+                </a>
+              </Link>
+            </div>
+            <div className="getLPTLink">
+              <Link href={`${pathname}?openExchange=true`} passHref>
+                <a
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 1,
+                    color: 'muted',
+                  }}
+                >
+                  <LPT
+                    sx={{ color: 'inherit', width: 20, height: 20, mr: 1 }}
+                  />{' '}
+                  Get LPT
+                  <Modal
+                    className="getLPT"
+                    isOpen={open}
+                    sx={{ maxWidth: 600 }}
+                    onDismiss={() => {
+                      Router.push(pathname)
+                    }}
+                  >
+                    <iframe
+                      sx={{
+                        bg: '#323639',
+                        width: '100%',
+                        height: '100%',
+                        border: '0',
+                      }}
+                      src={`https://uniswap.livepeerorg.now.sh/swap/0x58b6a8a3302369daec383334672404ee733ab239?connector=${
+                        context.connectorName
+                          ? context.connectorName
+                          : 'Network'
+                      }`}
+                    />
+                  </Modal>
+                </a>
+              </Link>
+            </div>
           </div>
         </Flex>
       </Flex>

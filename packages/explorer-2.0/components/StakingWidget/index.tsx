@@ -38,7 +38,7 @@ export default ({
   const context = useWeb3Context()
   let roundsSinceLastClaim = 0
   let lastClaimRound: number = 0
-  if (delegator) {
+  if (delegator && delegator.lastClaimRound) {
     lastClaimRound = parseInt(delegator.lastClaimRound.id, 10)
     roundsSinceLastClaim = parseInt(currentRound.id, 10) - lastClaimRound
   }
@@ -194,10 +194,7 @@ function renderBanners(
           </div>
         }
         button={
-          <Claim
-            lastClaimRound={lastClaimRound}
-            endRound={parseInt(currentRound.id, 10)}
-          >
+          <Claim lastClaimRound={lastClaimRound} endRound={currentRound}>
             Claim
           </Claim>
         }
