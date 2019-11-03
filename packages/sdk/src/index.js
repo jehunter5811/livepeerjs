@@ -1280,13 +1280,16 @@ export async function createLivepeerSDK(
       unbondingLockId: string,
       tx = config.defaultTx,
     ): Promise<TxReceipt> {
-      return await utils.getTxReceipt(
-        await BondingManager.rebond(unbondingLockId, {
-          ...config.defaultTx,
-          ...tx,
-        }),
-        config.eth,
-      )
+      const txHash = await BondingManager.rebond(unbondingLockId, {
+        ...config.defaultTx,
+        ...tx,
+      })
+
+      if (tx.returnTxHash) {
+        return txHash
+      }
+
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**
@@ -1323,13 +1326,20 @@ export async function createLivepeerSDK(
       unbondingLockId: number,
       tx = config.defaultTx,
     ): Promise<TxReceipt> {
-      return await utils.getTxReceipt(
-        await BondingManager.rebondFromUnbonded(addr, unbondingLockId, {
+      const txHash = await BondingManager.rebondFromUnbonded(
+        addr,
+        unbondingLockId,
+        {
           ...config.defaultTx,
           ...tx,
-        }),
-        config.eth,
+        },
       )
+
+      if (tx.returnTxHash) {
+        return txHash
+      }
+
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**
@@ -1921,11 +1931,11 @@ export async function createLivepeerSDK(
      */
     async initializeRound(tx = config.defaultTx): Promise<TxReceipt> {
       try {
-        // initialize round
-        return await utils.getTxReceipt(
-          await RoundsManager.initializeRound(tx),
-          config.eth,
-        )
+        const txHash = await RoundsManager.initializeRound(tx)
+        if (tx.returnTxHash) {
+          return txHash
+        }
+        return await utils.getTxReceipt(txHash, config.eth)
       } catch (err) {
         err.message = 'Error: initializeRound\n' + err.message
         throw err
@@ -1954,39 +1964,48 @@ export async function createLivepeerSDK(
       })
     },
 
+    // TODO: - check token balance
     async approveTokenBondAmount(
       amount: string,
       tx: TxObject,
     ): Promise<TxReceipt> {
       const token = toBN(amount)
-      // TODO: - check token balance
-      await utils.getTxReceipt(
-        await LivepeerToken.approve(BondingManager.address, token, {
+      const txHash = await LivepeerToken.approve(
+        BondingManager.address,
+        token,
+        {
           ...config.defaultTx,
           ...tx,
-        }),
-        config.eth,
+        },
       )
+      if (tx.returnTxHash) {
+        return txHash
+      }
+
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
+    // TODO: check for existing approval / round initialization / token balance
     async bondApprovedTokenAmount(
       to: string,
       amount: string,
       tx: TxObject,
     ): Promise<TxReceipt> {
       const token = toBN(amount)
-      // TODO: check for existing approval / round initialization / token balance
-      return await utils.getTxReceipt(
-        await BondingManager.bond(
-          token,
-          await resolveAddress(rpc.getENSAddress, to),
-          {
-            ...config.defaultTx,
-            ...tx,
-          },
-        ),
-        config.eth,
+      const txHash = await BondingManager.bond(
+        token,
+        await resolveAddress(rpc.getENSAddress, to),
+        {
+          ...config.defaultTx,
+          ...tx,
+        },
       )
+
+      if (tx.returnTxHash) {
+        return txHash
+      }
+
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**
@@ -2067,39 +2086,16 @@ export async function createLivepeerSDK(
      * // }
      */
     async unbond(amount: string, tx = config.defaultTx): Promise<TxReceipt> {
-      const { status, pendingStake, bondedAmount } = await rpc.getDelegator(
-        tx.from,
-      )
-      // pendingStake = 0 if delegator has claimed earnings through the current round
-      // In this case, bondedAmount is up to date
-      const totalStake =
-        toBN(pendingStake).cmp(toBN(bondedAmount)) < 0
-          ? bondedAmount
-          : pendingStake
-      // Only unbond if amount doesn't exceed your current stake
-      if (toBN(totalStake).cmp(toBN(amount)) < 0) {
-        throw new Error(
-          `Cannot unbond a portion of tokens greater than your total stake of ${totalStake} LPT`,
-        )
+      const txHash = await BondingManager.unbond(amount, {
+        ...config.defaultTx,
+        ...tx,
+      })
+
+      if (tx.returnTxHash) {
+        return txHash
       }
 
-      // Unbond total stake if a zero or negative amount is passed
-      amount = amount <= 0 ? totalStake : amount
-
-      // Can only unbond successfully when not already "Unbonded"
-      if (status === DELEGATOR_STATUS.Unbonded) {
-        throw new Error('This account is already unbonded.')
-      }
-
-      tx.gas = await rpc.estimateGas('BondingManager', 'unbond', [amount])
-
-      return await utils.getTxReceipt(
-        await BondingManager.unbond(amount, {
-          ...config.defaultTx,
-          ...tx,
-        }),
-        config.eth,
-      )
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**
@@ -2296,29 +2292,19 @@ export async function createLivepeerSDK(
      * // }
      */
     async withdrawStake(
+      unbondingLockId: string,
       tx = config.defaultTx,
-      unbondingLockId = null,
     ): Promise<TxReceipt> {
-      const {
-        status,
-        withdrawAmount,
-        nextUnbondingLockId,
-      } = await rpc.getDelegator(tx.from)
+      const txHash = await BondingManager.withdrawStake(unbondingLockId, {
+        ...config.defaultTx,
+        ...tx,
+      })
 
-      if (status === DELEGATOR_STATUS.Unbonding && !unbondingLockId) {
-        throw new Error('Delegator must wait through unbonding period')
-      } else if (withdrawAmount === '0') {
-        throw new Error('Delegator does not have anything to withdraw')
-      } else {
-        unbondingLockId = toBN(nextUnbondingLockId)
-        if (unbondingLockId.cmp(new BN(0)) > 0) {
-          unbondingLockId = unbondingLockId.sub(new BN(1))
-        }
-        return await utils.getTxReceipt(
-          await BondingManager.withdrawStake(toString(unbondingLockId), tx),
-          config.eth,
-        )
+      if (tx.returnTxHash) {
+        return txHash
       }
+
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**
@@ -2370,11 +2356,14 @@ export async function createLivepeerSDK(
       }
 
       let unbondingLockId = toBN(id)
-
-      return await utils.getTxReceipt(
-        await BondingManager.withdrawStake(toString(unbondingLockId), tx),
-        config.eth,
+      const txHash = await BondingManager.withdrawStake(
+        toString(unbondingLockId),
+        tx,
       )
+      if (tx.returnTxHash) {
+        return txHash
+      }
+      return await utils.getTxReceipt(txHash, config.eth)
     },
 
     /**

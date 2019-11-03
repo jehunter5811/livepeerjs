@@ -28235,9 +28235,9 @@ protocol-buffers-schema@^3.3.1:
   resolved "https://registry.yarnpkg.com/protocol-buffers-schema/-/protocol-buffers-schema-3.3.2.tgz#00434f608b4e8df54c59e070efeefc37fb4bb859"
   integrity sha512-Xdayp8sB/mU+sUV4G7ws8xtYMGdQnxbeIfLjyO9TZZRJdztBGhlmbI5x1qcY4TG5hBkIKGnc28i7nXxaugu88w==
 
-"protocol@https://github.com/livepeer/protocol.git#65d6eaaa7875ee4f66029eee519f8c3fa9af89da":
+"protocol@https://github.com/livepeer/protocol.git#63b2278211f0912799416a16b53a6bcfa38107f9":
   version "1.0.0"
-  resolved "https://github.com/livepeer/protocol.git#65d6eaaa7875ee4f66029eee519f8c3fa9af89da"
+  resolved "https://github.com/livepeer/protocol.git#63b2278211f0912799416a16b53a6bcfa38107f9"
 
 protocols@^1.1.0, protocols@^1.4.0:
   version "1.4.7"
