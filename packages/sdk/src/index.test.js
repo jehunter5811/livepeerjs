@@ -316,32 +316,6 @@ test('should return object with correct shape from getCurrentRoundInfo()', async
   t.pass()
 })
 
-// Jobs
-
-test('should return object with correct shape from getJob()', async t => {
-  const schema = object({
-    id: string,
-    streamId: string,
-    transcodingOptions: array(
-      object({
-        hash: string,
-        name: string,
-        bitrate: string,
-        framerate: number,
-        resolution: string,
-      }),
-    ),
-    transcoder: string,
-    broadcaster: string,
-  })
-  const res = await livepeer.rpc.getJobs()
-  for (const x of res) {
-    const job = await livepeer.rpc.getJob(x.id)
-    schema.validateSync(job)
-  }
-  t.pass()
-})
-
 test('should return number that signifies the estimated amount of gas to be used', async t => {
   const cases = [
     {
@@ -374,42 +348,6 @@ test('should return number that signifies the estimated amount of gas to be used
     t.true(number.isValidSync(res))
     t.true(res > 0)
   }
-  t.pass()
-})
-
-test('should return object with correct shape from getJobsInfo()', async t => {
-  const schema = object({
-    total: string,
-    verificationRate: string,
-    verificationSlashingPeriod: string,
-    finderFee: string,
-  })
-  const { from } = livepeer.config.defaultTx
-  const res = await livepeer.rpc.getJobsInfo(from)
-  schema.validateSync(res)
-  t.pass()
-})
-
-test('should get many jobs from getJobs()', async t => {
-  const schema = object({
-    id: string,
-    streamId: string,
-    transcodingOptions: array(
-      object({
-        name: string,
-        bitrate: string,
-        framerate: yup
-          .number()
-          .positive()
-          .required(),
-        resolution: string,
-      }),
-    ),
-    broadcaster: string,
-  })
-  const { from } = livepeer.config.defaultTx
-  const res = await livepeer.rpc.getJobs()
-  res.forEach(x => schema.validateSync(x))
   t.pass()
 })
 
