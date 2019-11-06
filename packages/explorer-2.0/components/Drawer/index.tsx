@@ -26,7 +26,7 @@ export default ({ items = [] }) => {
     } else {
       setOpen(false)
     }
-  })
+  }, [query.openExchange])
 
   return (
     <Flex
@@ -109,6 +109,11 @@ export default ({ items = [] }) => {
                     alignItems: 'center',
                     fontSize: 1,
                     color: 'muted',
+                    transition: 'color .3s',
+                    '&:hover': {
+                      color: 'primary',
+                      transition: 'color .3s',
+                    },
                   }}
                 >
                   <New
@@ -130,6 +135,11 @@ export default ({ items = [] }) => {
                     alignItems: 'center',
                     fontSize: 1,
                     color: 'muted',
+                    transition: 'color .3s',
+                    '&:hover': {
+                      color: 'primary',
+                      transition: 'color .3s',
+                    },
                   }}
                 >
                   <LPT
@@ -176,6 +186,11 @@ export default ({ items = [] }) => {
                   alignItems: 'center',
                   fontSize: 1,
                   color: 'muted',
+                  transition: 'color .3s',
+                  '&:hover': {
+                    color: 'primary',
+                    transition: 'color .3s',
+                  },
                 }}
               >
                 <Wallet

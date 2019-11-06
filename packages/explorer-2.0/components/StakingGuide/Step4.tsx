@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import React, { useState, useEffect } from 'react'
-import { jsx, Styled } from 'theme-ui'
+import { jsx, Flex, Styled } from 'theme-ui'
 import Router, { useRouter } from 'next/router'
 import Copy from '../../static/img/copy.svg'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
@@ -28,8 +28,21 @@ export default ({ goTo, nextStep }) => {
     <div sx={{ pb: 1 }}>
       <Styled.h2 sx={{ mb: 2 }}>Swap ETH for LPT</Styled.h2>
       <div sx={{ lineHeight: 1.5 }}>
-        Connect to Uniswap and swap ETH for LPT. Don't have ETH? Get some on
-        Coinbase and send to this address:
+        <div sx={{ mb: 2 }}>
+          Don't have ETH? Get some on{' '}
+          <a
+            href="https://coinbase.com"
+            target="__blank"
+            sx={{
+              color: 'rgba(22, 82, 240)',
+              textDecoration: 'underline',
+            }}
+          >
+            Coinbase
+          </a>{' '}
+          and send to your address.
+        </div>
+        <div>My Address:</div>
         <div
           sx={{
             display: 'inline-flex',
@@ -42,20 +55,20 @@ export default ({ goTo, nextStep }) => {
             text={context.account}
             onCopy={() => setCopied(true)}
           >
-            <div>
-              <span sx={{ mx: 1 }}>
+            <Flex sx={{ alignItems: 'center' }}>
+              <span sx={{ fontSize: 2, fontFamily: 'monospace', mr: 1 }}>
                 {context.account.replace(context.account.slice(7, 37), '…')}
               </span>
               <Copy
                 sx={{
                   mr: 1,
                   cursor: 'pointer',
-                  width: 16,
-                  height: 16,
+                  width: 14,
+                  height: 14,
                   color: 'text',
                 }}
               />
-            </div>
+            </Flex>
           </CopyToClipboard>
           {copied && <span sx={{ fontSize: 12, color: 'text' }}>Copied</span>}
         </div>
@@ -78,11 +91,11 @@ export default ({ goTo, nextStep }) => {
         disabled={account && account.tokenBalance === '0'}
         sx={{ position: 'absolute', right: 30, bottom: 16 }}
         onClick={async () => {
-          await Router.push(
-            removeURLParameter(router.pathname, 'openExchange'),
-            removeURLParameter(router.asPath, 'openExchange'),
-          ) // remove query param
           if (account.allowance === '0') {
+            Router.push(
+              removeURLParameter(router.pathname, 'openExchange'),
+              removeURLParameter(router.asPath, 'openExchange'),
+            ) // remove query param
             goTo(nextStep)
           } else {
             await Router.push('/')

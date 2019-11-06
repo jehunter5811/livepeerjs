@@ -55,8 +55,14 @@ export default ({ goTo, nextStep }) => {
       )}
       <Button
         disabled={isBroadcasted}
-        onClick={() => {
-          approve()
+        onClick={async () => {
+          try {
+            await approve()
+          } catch (e) {
+            return {
+              error: e.message.replace('GraphQL error: ', ''),
+            }
+          }
         }}
         sx={{ position: 'absolute', right: 30, bottom: 16 }}
       >

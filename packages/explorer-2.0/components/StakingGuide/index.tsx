@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic'
 import { useWeb3Context } from 'web3-react'
 import { useAccount } from '../../hooks'
 import { useCookies } from 'react-cookie'
+import { useApolloClient, useQuery } from '@apollo/react-hooks'
 import Step1 from './Step1'
 import Step2 from './Step2'
 import Step3 from './Step3'
@@ -14,12 +15,19 @@ import Step4 from './Step4'
 import Step5 from './Step5'
 import Step6 from './Step6'
 import Step7 from './Step7'
+import gql from 'graphql-tag'
 
 const Tour: any = dynamic(() => import('reactour'), { ssr: false })
 
+const GET_TOUR_OPEN = gql`
+  {
+    tourOpen @client
+  }
+`
+
 export default ({ children }) => {
+  const client = useApolloClient()
   const [open, setOpen] = useState(false)
-  const [tourOpen, setTourOpen] = useState(false)
   const [tourKey, setTourKey] = useState(0)
   const context = useWeb3Context()
   const { account } = useAccount()
@@ -31,6 +39,8 @@ export default ({ children }) => {
     backgroundColor: '#131418',
     maxWidth: 'auto',
   })
+
+  const { data } = useQuery(GET_TOUR_OPEN)
 
   useEffect(() => {
     if (nextStep === 6) {
@@ -76,6 +86,7 @@ export default ({ children }) => {
         },
       },
       {
+        action: node => node.focus(),
         selector: '.tour-step-6',
         content: ({ goTo }) => {
           return <Step6 goTo={goTo} nextStep={nextStep} />
@@ -83,6 +94,7 @@ export default ({ children }) => {
         style: tourStyles,
       },
       {
+        action: node => node.focus(),
         selector: '.tour-step-7',
         content: ({ goTo }) => {
           return <Step7 goTo={goTo} nextStep={nextStep} />
@@ -112,11 +124,15 @@ export default ({ children }) => {
         accentColor="#E926BE"
         maskSpace={10}
         startAt={cookies.connector ? 2 : 0}
-        isOpen={tourOpen}
+        isOpen={data.tourOpen}
         nextButton={<Button>Next</Button>}
         closeWithMask={false}
         onRequestClose={() => {
-          setTourOpen(false)
+          client.writeData({
+            data: {
+              tourOpen: false,
+            },
+          })
           setTourKey(tourKey + 1)
         }}
         getCurrentStep={curr => {
@@ -222,7 +238,11 @@ export default ({ children }) => {
                 variant="secondary"
                 onClick={() => {
                   setOpen(false)
-                  setTourOpen(true)
+                  client.writeData({
+                    data: {
+                      tourOpen: true,
+                    },
+                  })
                 }}
               >
                 Let's Get Started
