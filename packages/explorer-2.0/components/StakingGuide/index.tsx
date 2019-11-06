@@ -7,7 +7,12 @@ import dynamic from 'next/dynamic'
 import Router, { useRouter } from 'next/router'
 import { useWeb3Context } from 'web3-react'
 import { useAccount } from '../../hooks'
-
+import Utils from 'web3-utils'
+import Copy from '../../static/img/copy.svg'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
+import { useCookies } from 'react-cookie'
+import { useApproveMutation } from '../../hooks'
+import Step5 from './Step5'
 const Tour: any = dynamic(() => import('reactour'), { ssr: false })
 const tourStyles = {
   backgroundColor: '#131418',
@@ -22,10 +27,19 @@ export default ({ children }) => {
   const [tourKey, setTourKey] = useState(0)
   const context = useWeb3Context()
   const { account } = useAccount()
+  const [nextStep, setNextStep] = useState(1)
+  const inititalSteps = []
+  const [steps, setSteps] = useState([...inititalSteps])
+  const [copied, setCopied] = useState(false)
+  const [cookies, setCookie, removeCookie] = useCookies(['connector'])
 
-  let inititalSteps = []
-
-  let [steps, setSteps] = useState([...inititalSteps])
+  useEffect(() => {
+    if (copied) {
+      setTimeout(() => {
+        setCopied(false)
+      }, 4000)
+    }
+  }, [copied])
 
   useEffect(() => {
     setSteps([
@@ -33,7 +47,7 @@ export default ({ children }) => {
         selector: '.connectWallet',
         content: ({ goTo }) => {
           Router.events.on('routeChangeComplete', url => {
-            if (url == '/connect-wallet') goTo(1)
+            if (url == '/connect-wallet') goTo(nextStep)
           })
           return (
             <div>
@@ -49,10 +63,9 @@ export default ({ children }) => {
       },
       {
         selector: '.chooseProvider',
-        content: ({ goTo, inDOM }) => {
+        content: ({ goTo }) => {
           Router.events.on('routeChangeComplete', url => {
-            // TODO: if already has lpt go to 4
-            if (url == '/connect-wallet?connected=true') goTo(2)
+            if (url == '/connect-wallet?connected=true') goTo(nextStep)
           })
           return (
             <div>
@@ -73,7 +86,7 @@ export default ({ children }) => {
         content: ({ goTo }) => {
           Router.events.on('routeChangeComplete', url => {
             if (url.includes('openExchange=true')) {
-              goTo(3)
+              goTo(nextStep)
             }
           })
           return (
@@ -91,24 +104,73 @@ export default ({ children }) => {
       },
       {
         selector: '.getLPT',
-        content: ({ goTo, inDOM }) => {
-          // if (account && account.tokenBalance) {
-
-          //   goTo(5)
-          // }
-          // TODO: show checkmark next to eth and lpt balances
+        content: ({ goTo }) => {
           return (
-            <div>
+            <div sx={{ pb: 1 }}>
               <Styled.h2 sx={{ mb: 2 }}>Swap ETH for LPT</Styled.h2>
-              <Styled.p>
-                Connect to Uniswap and swap ETH for LPT. Don't have ETH? You can
-                get some on Coinbase.
-              </Styled.p>
-              <div>Balance: {account && account.tokenBalance}</div>
+              <div sx={{ lineHeight: 1.5 }}>
+                Connect to Uniswap and swap ETH for LPT. Don't have ETH? Get
+                some on Coinbase and send to this address:
+                <div
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    fontFamily: 'monospace',
+                    mb: 3,
+                  }}
+                >
+                  <CopyToClipboard
+                    text={context.account}
+                    onCopy={() => setCopied(true)}
+                  >
+                    <div>
+                      <span sx={{ mx: 1 }}>
+                        {context.account.replace(
+                          context.account.slice(7, 37),
+                          '…',
+                        )}
+                      </span>
+                      <Copy
+                        sx={{
+                          mr: 1,
+                          cursor: 'pointer',
+                          width: 16,
+                          height: 16,
+                          color: 'text',
+                        }}
+                      />
+                    </div>
+                  </CopyToClipboard>
+                  {copied && (
+                    <span sx={{ fontSize: 12, color: 'text' }}>Copied</span>
+                  )}
+                </div>
+              </div>
+
+              <div sx={{ fontFamily: 'monospace', mb: 1 }}>
+                ETH Balance:{' '}
+                <span sx={{ fontWeight: 'bold' }}>
+                  {account &&
+                    parseFloat(Utils.fromWei(account.ethBalance)).toFixed(2)}
+                </span>
+              </div>
+              <div sx={{ fontFamily: 'monospace' }}>
+                LPT Balance:{' '}
+                <span sx={{ fontWeight: 'bold' }}>
+                  {account &&
+                    parseFloat(Utils.fromWei(account.tokenBalance)).toFixed(2)}
+                </span>
+              </div>
               <Button
+                disabled={account && account.tokenBalance === '0'}
+                sx={{ position: 'absolute', right: 30, bottom: 16 }}
                 onClick={async () => {
                   await Router.push(router.pathname) // remove query param
-                  goTo(5)
+                  if (account.allowance === '0') {
+                    goTo(nextStep)
+                  } else {
+                    goTo(nextStep + 1)
+                  }
                 }}
               >
                 Next
@@ -120,24 +182,20 @@ export default ({ children }) => {
         style: tourStyles,
       },
       {
-        content: 'Approve Livepeer tokens for staking.',
         title: 'Set Permissions',
         style: tourStyles,
+        content: ({ goTo }) => {
+          return <Step5 goTo={goTo} nextStep={nextStep} />
+        },
       },
       {
-        selector: '.my-fith-step',
-        content: 'This another awesome feature!',
+        selector: '.orchestratorsList',
+        content: 'Orchestrators List',
         title: 'Choose Orchestrator',
         style: tourStyles,
       },
-      {
-        selector: '.my-fith-step',
-        content: 'This another awesome feature!',
-        title: 'Stake',
-        style: tourStyles,
-      },
     ])
-  }, [account])
+  }, [account, context.active, nextStep, copied])
 
   return (
     <>
@@ -153,20 +211,22 @@ export default ({ children }) => {
 
       <Tour
         disableDotsNavigation={true}
+        disableKeyboardNavigation={['right', 'left']}
         key={tourKey}
         showButtons={false}
         accentColor={accentColor}
         maskSpace={10}
-        startAt={0}
+        startAt={cookies.connector ? 2 : 0}
         isOpen={tourOpen}
         nextButton={<Button>Next</Button>}
+        closeWithMask={false}
         onRequestClose={() => {
           setTourOpen(false)
           setTourKey(tourKey + 1)
         }}
-        // getCurrentStep={curr => {
-        //   setCurrentStep(curr + 1)
-        // }}
+        getCurrentStep={curr => {
+          setNextStep(curr + 1)
+        }}
         steps={steps}
       />
 

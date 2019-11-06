@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import React, { useState, useEffect } from 'react'
 import { jsx, Flex, Box, Styled } from 'theme-ui'
-import Page from '../layouts/main'
 import Router from 'next/router'
 import { useWeb3Context } from 'web3-react'
 import Wallet from '../static/img/wallet.svg'
@@ -11,11 +10,12 @@ import Secure from '../static/img/secure.svg'
 import ToggleCard from '../components/ToggleCard'
 import Button from '../components/Button'
 import { getLayout } from '../layouts/main'
-import { withApollo } from '../lib/apollo'
+import { useCookies } from 'react-cookie'
 
 const ConnectWallet = () => {
   const context = useWeb3Context()
   const [selectedProvider, setSelectedProvider] = useState('Portis')
+  const [cookies, setCookie] = useCookies(['connector'])
 
   // Redirect to user's account upon connection to web3
   // useEffect(() => {
@@ -59,11 +59,11 @@ const ConnectWallet = () => {
               providerName="Portis"
             />
             <ToggleCard
-              onClick={() => setSelectedProvider('MetaMask')}
+              onClick={() => setSelectedProvider('Injected')}
               sx={{ width: '50%' }}
               description="Browser extension based wallet with a high degree of control."
               icon={MetaMask}
-              isActive={selectedProvider == 'MetaMask'}
+              isActive={selectedProvider == 'Injected'}
               providerName="MetaMask"
             />
           </Flex>
@@ -72,6 +72,7 @@ const ConnectWallet = () => {
             className="connectWalletButton"
             sx={{ mb: 4 }}
             onClick={async () => {
+              setCookie('connector', selectedProvider)
               await context.setConnector(selectedProvider)
               Router.push('/connect-wallet?connected=true')
             }}

@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx, Styled, Flex } from 'theme-ui'
-import React, { useState } from 'react'
+import React from 'react'
 import Head from 'next/head'
 import Drawer from '../components/Drawer'
 import Reset from '../lib/reset'
@@ -9,11 +9,16 @@ import Account from '../static/img/account.svg'
 import Wallet from '../static/img/wallet.svg'
 import Search from '../static/img/search.svg'
 import { useWeb3Context } from 'web3-react'
+import { useCookies } from 'react-cookie'
 import { ethers } from 'ethers'
 
 const Layout = ({ children, title = 'Livepeer Explorer' }) => {
   const context = useWeb3Context()
   const { account } = context
+  const [cookies, setCookie, removeCookie] = useCookies(['connector'])
+  if (cookies.connector) {
+    context.setConnector(cookies.connector)
+  }
 
   let items = [
     {

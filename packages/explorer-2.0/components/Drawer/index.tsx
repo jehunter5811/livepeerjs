@@ -4,17 +4,20 @@ import { jsx, Flex, Box } from 'theme-ui'
 import Logo from '../../static/img/logo.svg'
 import LPT from '../../static/img/lpt.svg'
 import New from '../../static/img/new.svg'
+import Wallet from '../../static/img/wallet.svg'
 import Link from 'next/link'
 import Router, { useRouter } from 'next/router'
 import { useWeb3Context } from 'web3-react'
 import StakingGuide from '../StakingGuide'
 import Modal from '../Modal'
+import { useCookies } from 'react-cookie'
 
 export default ({ items = [] }) => {
   const router = useRouter()
   const { query, pathname, asPath } = router
   const context = useWeb3Context()
   const [open, setOpen] = useState(query && query.openExchange ? true : false)
+  const [cookies, setCookie, removeCookie] = useCookies(['connector'])
 
   useEffect(() => {
     if (query && query.openExchange) {
@@ -114,7 +117,7 @@ export default ({ items = [] }) => {
                 </a>
               </Link>
             </div>
-            <div className="getLPTLink">
+            <div sx={{ mb: 2 }} className="getLPTLink">
               <Link href={`${pathname}?openExchange=true`} passHref>
                 <a
                   sx={{
@@ -146,13 +149,33 @@ export default ({ items = [] }) => {
                       src={`https://uniswap.livepeerorg.now.sh/swap/0x58b6a8a3302369daec383334672404ee733ab239?connector=${
                         context.connectorName
                           ? context.connectorName
-                          : 'Network'
+                          : 'Injected'
                       }`}
                     />
                   </Modal>
                 </a>
               </Link>
             </div>
+            {context.active && (
+              <div
+                onClick={async () => {
+                  await removeCookie('connector')
+                  context.unsetConnector()
+                }}
+                sx={{
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: 1,
+                  color: 'muted',
+                }}
+              >
+                <Wallet
+                  sx={{ color: 'inherit', width: 18, height: 18, mr: 1 }}
+                />
+                Disconnect
+              </div>
+            )}
           </div>
         </Flex>
       </Flex>
