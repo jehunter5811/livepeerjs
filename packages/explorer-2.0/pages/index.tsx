@@ -80,7 +80,7 @@ const Index = () => {
           <Spinner />
         </Flex>
       ) : (
-        <>
+        <Flex sx={{ width: '100%' }}>
           <Flex sx={{ paddingTop: 5, pr: 6, width: '70%' }}>
             <Orchestrators
               currentRound={data.currentRound[0]}
@@ -107,7 +107,7 @@ const Index = () => {
               protocol={data.protocol}
             />
           </Flex>
-        </>
+        </Flex>
       )}
     </>
   )

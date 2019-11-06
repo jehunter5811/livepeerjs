@@ -11,6 +11,7 @@ import { useWeb3Context } from 'web3-react'
 import StakingGuide from '../StakingGuide'
 import Modal from '../Modal'
 import { useCookies } from 'react-cookie'
+import { removeURLParameter } from '../../lib/utils'
 
 export default ({ items = [] }) => {
   const router = useRouter()
@@ -117,8 +118,12 @@ export default ({ items = [] }) => {
                 </a>
               </Link>
             </div>
-            <div sx={{ mb: 2 }} className="getLPTLink">
-              <Link href={`${pathname}?openExchange=true`} passHref>
+            <div sx={{ mb: 2 }} className="tour-step-3">
+              <Link
+                href={`${pathname}?openExchange=true`}
+                as={`${asPath}?openExchange=true`}
+                passHref
+              >
                 <a
                   sx={{
                     display: 'flex',
@@ -132,11 +137,14 @@ export default ({ items = [] }) => {
                   />{' '}
                   Get LPT
                   <Modal
-                    className="getLPT"
+                    className="tour-step-4"
                     isOpen={open}
                     sx={{ maxWidth: 600 }}
                     onDismiss={() => {
-                      Router.push(pathname)
+                      Router.push(
+                        removeURLParameter(pathname, 'openExchange'),
+                        removeURLParameter(asPath, 'openExchange'),
+                      )
                     }}
                   >
                     <iframe

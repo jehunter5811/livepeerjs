@@ -61,6 +61,7 @@ export function useAccount(address = null) {
 }
 
 export function useApproveMutation(amount = null) {
+  const context = useWeb3Context()
   const [result, setResult] = useState({
     approve: null,
     isBroadcasted: false,
@@ -68,7 +69,6 @@ export function useApproveMutation(amount = null) {
     isMined: false,
     txHash: null,
   })
-  let context = useWeb3Context()
 
   const APPROVE = gql`
     mutation approve($type: String!, $amount: String!) {
@@ -99,22 +99,18 @@ export function useApproveMutation(amount = null) {
     },
   })
 
-  let isBroadcasted = data && data.txHash
-  let isMined = false
-  let isMining = false
-
   const { data: transaction } = useQuery(GET_TRANSACTION_RECEIPT, {
     variables: {
       id: `${data && data.txHash}-Approval`,
     },
     ssr: false,
-    pollInterval: 2000,
+    pollInterval: 1000,
     // skip query if tx hasn't yet been broadcasted or has been mined
-    skip: !isBroadcasted || isMined,
+    skip: !result.isBroadcasted || result.isMined,
   })
 
-  isMining = transaction && !transaction.approvalEvent
-  isMined = transaction && transaction.approvalEvent
+  let isMining = !!(transaction && !transaction.approvalEvent)
+  let isMined = !!(transaction && transaction.approvalEvent)
 
   useEffect(() => {
     if (approve) {
@@ -126,9 +122,9 @@ export function useApproveMutation(amount = null) {
     if (transaction) {
       setResult({
         ...result,
-        isMining: !!isMining && !isMined,
-        isMined: !!isMined,
-        isBroadcasted: !!isMined ? false : true,
+        isMining: isMining && !isMined,
+        isMined: isMined,
+        isBroadcasted: isMined ? false : true,
       })
     }
   }, [transaction, data, approve])

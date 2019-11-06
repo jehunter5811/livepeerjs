@@ -48,7 +48,7 @@ const ConnectWallet = () => {
           />
           Connect Wallet
         </Styled.h1>
-        <div className="chooseProvider">
+        <div className="tour-step-2">
           <Flex sx={{ width: ['100%', '100%', '100%', '100%'], mb: 3 }}>
             <ToggleCard
               onClick={() => setSelectedProvider('Portis')}

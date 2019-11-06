@@ -135,7 +135,7 @@ export default ({ currentRound, transcoders }) => {
           {accountColumn.canFilter ? accountColumn.render('Filter') : null}
         </div>
       </Flex>
-      <Box className="orchestratorsList">
+      <Box>
         <table
           sx={{
             display: 'table',

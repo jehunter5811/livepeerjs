@@ -4,24 +4,20 @@ import { jsx, Styled, Flex } from 'theme-ui'
 import { DialogOverlay, DialogContent } from '@reach/dialog'
 import Button from '../Button'
 import dynamic from 'next/dynamic'
-import Router, { useRouter } from 'next/router'
 import { useWeb3Context } from 'web3-react'
 import { useAccount } from '../../hooks'
-import Utils from 'web3-utils'
-import Copy from '../../static/img/copy.svg'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useCookies } from 'react-cookie'
-import { useApproveMutation } from '../../hooks'
+import Step1 from './Step1'
+import Step2 from './Step2'
+import Step3 from './Step3'
+import Step4 from './Step4'
 import Step5 from './Step5'
-const Tour: any = dynamic(() => import('reactour'), { ssr: false })
-const tourStyles = {
-  backgroundColor: '#131418',
-}
+import Step6 from './Step6'
+import Step7 from './Step7'
 
-const accentColor = '#E926BE'
+const Tour: any = dynamic(() => import('reactour'), { ssr: false })
 
 export default ({ children }) => {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [tourOpen, setTourOpen] = useState(false)
   const [tourKey, setTourKey] = useState(0)
@@ -30,172 +26,71 @@ export default ({ children }) => {
   const [nextStep, setNextStep] = useState(1)
   const inititalSteps = []
   const [steps, setSteps] = useState([...inititalSteps])
-  const [copied, setCopied] = useState(false)
   const [cookies, setCookie, removeCookie] = useCookies(['connector'])
+  const [tourStyles, setTourStyles] = useState({
+    backgroundColor: '#131418',
+    maxWidth: 'auto',
+  })
 
   useEffect(() => {
-    if (copied) {
-      setTimeout(() => {
-        setCopied(false)
-      }, 4000)
+    if (nextStep === 6) {
+      setTourStyles({
+        ...tourStyles,
+        maxWidth: '270px',
+      })
+    } else {
+      setTourStyles({
+        ...tourStyles,
+        maxWidth: 'auto',
+      })
     }
-  }, [copied])
+  }, [nextStep])
 
   useEffect(() => {
     setSteps([
       {
-        selector: '.connectWallet',
-        content: ({ goTo }) => {
-          Router.events.on('routeChangeComplete', url => {
-            if (url == '/connect-wallet') goTo(nextStep)
-          })
-          return (
-            <div>
-              <Styled.h2 sx={{ mb: 2 }}>Connect Wallet</Styled.h2>
-              <Styled.p>
-                First things first. Let's connect your wallet.
-              </Styled.p>
-            </div>
-          )
-        },
-        title: 'Connect Wallet',
+        selector: '.tour-step-1',
+        content: ({ goTo }) => <Step1 goTo={goTo} nextStep={nextStep} />,
         style: tourStyles,
       },
       {
-        selector: '.chooseProvider',
-        content: ({ goTo }) => {
-          Router.events.on('routeChangeComplete', url => {
-            if (url == '/connect-wallet?connected=true') goTo(nextStep)
-          })
-          return (
-            <div>
-              <Styled.h2 sx={{ mb: 2 }}>Choose Provider</Styled.h2>
-              <Styled.p>
-                Select your preferred wallet. You can change your selected
-                wallet or address later.
-              </Styled.p>
-            </div>
-          )
-        },
-        title: 'Choose Provider',
+        selector: '.tour-step-2',
+        content: ({ goTo }) => <Step2 goTo={goTo} nextStep={nextStep} />,
         style: tourStyles,
       },
 
       {
-        selector: '.getLPTLink',
-        content: ({ goTo }) => {
-          Router.events.on('routeChangeComplete', url => {
-            if (url.includes('openExchange=true')) {
-              goTo(nextStep)
-            }
-          })
-          return (
-            <div>
-              <Styled.h2 sx={{ mb: 2 }}>Get LPT</Styled.h2>
-              <Styled.p>
-                You'll need LPT to stake. Let's swap some ETH for LPT on
-                Uniswap.
-              </Styled.p>
-            </div>
-          )
-        },
-        title: 'Get LPT',
+        selector: '.tour-step-3',
+        content: ({ goTo }) => <Step3 goTo={goTo} nextStep={nextStep} />,
         style: tourStyles,
       },
       {
-        selector: '.getLPT',
-        content: ({ goTo }) => {
-          return (
-            <div sx={{ pb: 1 }}>
-              <Styled.h2 sx={{ mb: 2 }}>Swap ETH for LPT</Styled.h2>
-              <div sx={{ lineHeight: 1.5 }}>
-                Connect to Uniswap and swap ETH for LPT. Don't have ETH? Get
-                some on Coinbase and send to this address:
-                <div
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    fontFamily: 'monospace',
-                    mb: 3,
-                  }}
-                >
-                  <CopyToClipboard
-                    text={context.account}
-                    onCopy={() => setCopied(true)}
-                  >
-                    <div>
-                      <span sx={{ mx: 1 }}>
-                        {context.account.replace(
-                          context.account.slice(7, 37),
-                          '…',
-                        )}
-                      </span>
-                      <Copy
-                        sx={{
-                          mr: 1,
-                          cursor: 'pointer',
-                          width: 16,
-                          height: 16,
-                          color: 'text',
-                        }}
-                      />
-                    </div>
-                  </CopyToClipboard>
-                  {copied && (
-                    <span sx={{ fontSize: 12, color: 'text' }}>Copied</span>
-                  )}
-                </div>
-              </div>
-
-              <div sx={{ fontFamily: 'monospace', mb: 1 }}>
-                ETH Balance:{' '}
-                <span sx={{ fontWeight: 'bold' }}>
-                  {account &&
-                    parseFloat(Utils.fromWei(account.ethBalance)).toFixed(2)}
-                </span>
-              </div>
-              <div sx={{ fontFamily: 'monospace' }}>
-                LPT Balance:{' '}
-                <span sx={{ fontWeight: 'bold' }}>
-                  {account &&
-                    parseFloat(Utils.fromWei(account.tokenBalance)).toFixed(2)}
-                </span>
-              </div>
-              <Button
-                disabled={account && account.tokenBalance === '0'}
-                sx={{ position: 'absolute', right: 30, bottom: 16 }}
-                onClick={async () => {
-                  await Router.push(router.pathname) // remove query param
-                  if (account.allowance === '0') {
-                    goTo(nextStep)
-                  } else {
-                    goTo(nextStep + 1)
-                  }
-                }}
-              >
-                Next
-              </Button>
-            </div>
-          )
-        },
-        title: 'Get LPT',
+        selector: '.tour-step-4',
+        content: ({ goTo }) => <Step4 goTo={goTo} nextStep={nextStep} />,
         style: tourStyles,
       },
       {
-        title: 'Set Permissions',
         style: tourStyles,
         content: ({ goTo }) => {
           return <Step5 goTo={goTo} nextStep={nextStep} />
         },
       },
       {
-        selector: '.orchestratorsList',
-        content: 'Orchestrators List',
-        title: 'Choose Orchestrator',
+        selector: '.tour-step-6',
+        content: ({ goTo }) => {
+          return <Step6 goTo={goTo} nextStep={nextStep} />
+        },
+        style: tourStyles,
+      },
+      {
+        selector: '.tour-step-7',
+        content: ({ goTo }) => {
+          return <Step7 goTo={goTo} nextStep={nextStep} />
+        },
         style: tourStyles,
       },
     ])
-  }, [account, context.active, nextStep, copied])
+  }, [account, context.active, nextStep, tourStyles])
 
   return (
     <>
@@ -214,7 +109,7 @@ export default ({ children }) => {
         disableKeyboardNavigation={['right', 'left']}
         key={tourKey}
         showButtons={false}
-        accentColor={accentColor}
+        accentColor="#E926BE"
         maskSpace={10}
         startAt={cookies.connector ? 2 : 0}
         isOpen={tourOpen}

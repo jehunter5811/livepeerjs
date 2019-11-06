@@ -44,7 +44,7 @@ const Layout = ({ children, title = 'Livepeer Explorer' }) => {
           </div>
         </div>
       ),
-      className: 'connectWallet',
+      className: 'tour-step-1',
       href: !account ? '/connect-wallet' : '/accounts/[account]/[slug]',
       as: !account ? '/connect-wallet' : `/accounts/${account}/staking`,
       icon: !account ? Wallet : Account,
@@ -70,7 +70,7 @@ const Layout = ({ children, title = 'Livepeer Explorer' }) => {
             padding: '0 32px',
           }}
         >
-          Mobile support coming soon!
+          Mobile support coming soon.
         </div>
 
         <div
@@ -83,12 +83,14 @@ const Layout = ({ children, title = 'Livepeer Explorer' }) => {
           <Drawer items={items} />
           <Flex
             sx={{
-              width: 'calc(100% - 256px)',
               paddingLeft: 40,
               paddingRight: 40,
+              width: 'calc(100% - 256px)',
             }}
           >
-            {children}
+            <Flex sx={{ width: '100%' }} className="tour-step-6">
+              {children}
+            </Flex>
           </Flex>
         </div>
       </Styled.root>

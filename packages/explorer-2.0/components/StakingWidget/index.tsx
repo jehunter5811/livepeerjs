@@ -44,7 +44,7 @@ export default ({
   }
 
   return (
-    <div>
+    <div className="tour-step-7">
       {renderBanners(
         context,
         account,

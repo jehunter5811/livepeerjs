@@ -1,19 +1,25 @@
 /** @jsx jsx */
-import React from 'react'
+import { useEffect } from 'react'
 import { jsx, Styled } from 'theme-ui'
 import Button from '../Button'
 import { useApproveMutation } from '../../hooks'
-import { useWeb3Context } from 'web3-react'
-import NewTab from '../../static/img/open-in-new.svg'
 import Spinner from '../Spinner'
 import { Flex } from 'theme-ui'
+import Router from 'next/router'
 
 export default ({ goTo, nextStep }) => {
   const { approve, isBroadcasted, isMined, txHash } = useApproveMutation()
 
-  if (isMined) {
-    goTo(nextStep)
-  }
+  useEffect(() => {
+    async function goToNextStep() {
+      if (isMined) {
+        await Router.push('/')
+        goTo(nextStep)
+      }
+    }
+    goToNextStep()
+  }, [isMined])
+
   return (
     <div sx={{ py: 1 }}>
       <Styled.h2 sx={{ mb: 2 }}>Set Permissions</Styled.h2>
