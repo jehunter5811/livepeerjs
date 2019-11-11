@@ -10149,6 +10149,11 @@ cosmiconfig@^5.0.0, cosmiconfig@^5.0.7, cosmiconfig@^5.1.0, cosmiconfig@^5.2.0, 
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
+countup.js@^1.9.3:
+  version "1.9.3"
+  resolved "https://registry.yarnpkg.com/countup.js/-/countup.js-1.9.3.tgz#ce3e50cd7160441e478f07da31895edcc0f1c9dd"
+  integrity sha1-zj5QzXFgRB5HjwfaMYle3MDxyd0=
+
 cp-file@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/cp-file/-/cp-file-6.2.0.tgz#40d5ea4a1def2a9acdd07ba5c0b0246ef73dc10d"
@@ -24540,6 +24545,15 @@ react-copy-to-clipboard@^5.0.1:
   dependencies:
     copy-to-clipboard "^3"
     prop-types "^15.5.8"
+
+react-countup@^4.2.3:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/react-countup/-/react-countup-4.2.3.tgz#22581e68861b2b93be0cf0d5c4c6dff349e7b3b0"
+  integrity sha512-4re0CdtymFC0z5YivMnnBg2SC5ugqt4is/Y/RyTRTY/4QePawUhi2+Y23cQPUjXsdm/FpvicD9ZkQ4H+zVBsZg==
+  dependencies:
+    countup.js "^1.9.3"
+    prop-types "^15.7.2"
+    warning "^4.0.3"
 
 react-dev-utils@^9.0.0, react-dev-utils@^9.1.0:
   version "9.1.0"
