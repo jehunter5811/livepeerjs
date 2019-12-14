@@ -45,6 +45,16 @@ export default ({ currentRound, transcoders }) => {
         Filter: DefaultColumnFilter,
       },
       {
+        Header: 'Activation Round',
+        accessor: 'activationRound',
+        show: false,
+      },
+      {
+        Header: 'Deactivation Round',
+        accessor: 'deactivationRound',
+        show: false,
+      },
+      {
         Header: 'Active',
         accessor: 'active',
         show: false,
@@ -381,13 +391,11 @@ function renderSwitch(cell, currentRound) {
       )
     case 'Account':
       const status = getDelegatorStatus(cell.row.values.delegator, currentRound)
+      const active =
+        cell.row.values.activationRound <= currentRound.id &&
+        cell.row.values.deactivationRound > currentRound.id
       return (
-        <AccountCell
-          status={status}
-          active={cell.row.values.active}
-          threeBoxSpace={cell.row.values.threeBoxSpace}
-          address={cell.value}
-        />
+        <AccountCell status={status} active={active} threeBoxSpace={cell.row.values.threeBoxSpace} address={cell.value} />
       )
     case 'Stake':
       return (

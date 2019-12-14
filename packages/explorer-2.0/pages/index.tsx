@@ -19,8 +19,9 @@ const GET_DATA = gql`
       id
       active
       feeShare
+      activationRound
+      deactivationRound
       rewardCut
-      status
       active
       totalStake
       threeBoxSpace {
