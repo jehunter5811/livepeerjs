@@ -146,6 +146,7 @@ export default ({ currentRound, transcoders }) => {
           sx={{
             display: 'table',
             width: '100%',
+            minWidth: 650,
             borderSpacing: '0',
             borderCollapse: 'collapse',
           }}
@@ -202,12 +203,13 @@ export default ({ currentRound, transcoders }) => {
                         '.orchestratorLink': {
                           borderBottom: '1px solid',
                           borderColor: 'text',
+                          display: 'inlineBlock',
                           transition: 'all .3s',
-                          '&:hover': {
-                            color: 'primary',
-                            borderColor: 'primary',
-                          },
                         },
+                      },
+                      '.orchestratorLink:hover': {
+                        color: 'primary',
+                        borderColor: 'primary',
                       },
                       '.status': {
                         borderColor:
@@ -234,7 +236,7 @@ export default ({ currentRound, transcoders }) => {
                             width: i > 0 ? 'auto' : 1,
                             fontSize: 1,
                             pl: 2,
-                            pr: 2,
+                            pr: i == 0 ? 0 : 2,
                             py: '16px',
                           }}
                           {...cell.getCellProps()}
