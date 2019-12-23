@@ -145,7 +145,7 @@ export default () => {
                   effect="solid"
                 />
                 <Help
-                  data-tip="Your current total stake"
+                  data-tip="Account's current total stake"
                   data-for="tooltip-total-staked"
                   sx={{
                     color: 'muted',
@@ -183,7 +183,7 @@ export default () => {
                     effect="solid"
                   />
                   <Help
-                    data-tip="How much you've staked all-time, minus rewards"
+                    data-tip="How much account has staked all-time, minus rewards"
                     data-for="tooltip-principal"
                     sx={{
                       color: 'muted',
@@ -215,7 +215,7 @@ export default () => {
                     effect="solid"
                   />
                   <Help
-                    data-tip="How much you've unstaked, all-time"
+                    data-tip="How much account has unstaked all-time"
                     data-for="tooltip-unstaked"
                     sx={{
                       color: 'muted',
@@ -247,7 +247,7 @@ export default () => {
                     effect="solid"
                   />
                   <Help
-                    data-tip="Your total rewards earned, all-time. Rewards are automatically staked."
+                    data-tip="Account's total rewards earned all-time."
                     data-for="tooltip-rewards"
                     sx={{
                       color: 'muted',
@@ -280,7 +280,7 @@ export default () => {
                     effect="solid"
                   />
                   <Help
-                    data-tip="Your stake equity relative to the entire network."
+                    data-tip="Account's equity relative to the entire network."
                     data-for="tooltip-equity"
                     sx={{
                       color: 'muted',
