@@ -10,3 +10,11 @@ export const timeout = (ms, fn) => {
     })
   })
 }
+
+// Array, shuffled
+export const shuffle = arr => {
+  const rands = arr.map(() => Math.random())
+  return Object.keys(arr)
+    .sort((a, b) => rands[a] - rands[b])
+    .map(idx => arr[idx])
+}
