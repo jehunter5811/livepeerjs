@@ -1147,8 +1147,6 @@ await rpc.withdrawFees()
 
 Returns **[TxReceipt](#txreceipt)**
 
-
-
 ### getDelegatorUnbondingLock
 
 Get an unbonding lock for a delegator
@@ -1406,8 +1404,6 @@ Type: [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 - `transactions` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;Transaction>** transactions in the block
 - `transactionsRoot` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** root transaction hash
 - `uncles` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;Uncle>** block uncles
-
-
 
 ### Log
 

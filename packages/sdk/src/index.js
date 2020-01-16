@@ -137,7 +137,7 @@ export const DEFAULTS = {
   provider: 'https://mainnet.infura.io/v3/e9dc54dbd8de4664890e641a8efa45b1',
   privateKeys: {}, // { [publicKey: string]: privateKey }
   account: '',
-  gas: 2.1 * 1000000, // 2.1m wei
+  gas: null,
   artifacts: {
     LivepeerToken: LivepeerTokenArtifact,
     LivepeerTokenFaucet: LivepeerTokenFaucetArtifact,
@@ -340,18 +340,9 @@ const prop = (k: string | number) => (x): any => x[k]
 const toBool = (x: any): boolean => !!x
 const toString = (x: Eth.BN): string => x.toString(10)
 const toNumber = (x: Eth.BN): string => Number(x.toString(10))
-const headToBool = compose(
-  toBool,
-  prop(0),
-)
-const headToString = compose(
-  toString,
-  prop(0),
-)
-const headToNumber = compose(
-  toNumber,
-  prop(0),
-)
+const headToBool = compose(toBool, prop(0))
+const headToString = compose(toString, prop(0))
+const headToNumber = compose(toNumber, prop(0))
 const invariant = (name, pos, type) => {
   throw new Error(`Missing argument "${name}" (${type}) at position ${pos}`)
 }
@@ -1254,7 +1245,6 @@ export async function createLivepeerSDK(
         ...config.defaultTx,
         ...tx,
       })
-
       if (tx.returnTxHash) {
         return txHash
       }
@@ -1327,7 +1317,6 @@ export async function createLivepeerSDK(
       return headToBool(
         await BondingManager.isActiveTranscoder(
           await resolveAddress(rpc.getENSAddress, addr),
-          await rpc.getCurrentRound(),
         ),
       )
     },
@@ -1410,29 +1399,23 @@ export async function createLivepeerSDK(
      */
     async getTranscoder(addr: string): Promise<Transcoder> {
       const address = await resolveAddress(rpc.getENSAddress, addr)
-      const status = await rpc.getTranscoderStatus(address)
-      const active = await rpc.getTranscoderIsActive(address)
       const totalStake = await rpc.getTranscoderTotalStake(address)
       const t = await BondingManager.getTranscoder(address)
       const feeShare = toString(t.feeShare)
       const lastRewardRound = toString(t.lastRewardRound)
-      const pendingFeeShare = toString(t.pendingFeeShare)
-      const pendingPricePerSegment = toString(t.pendingPricePerSegment)
-      const pendingRewardCut = toString(t.pendingRewardCut)
-      const pricePerSegment = toString(t.pricePerSegment)
       const rewardCut = toString(t.rewardCut)
+      const activationRound = toString(t.activationRound)
+      const deactivationRound = toString(t.deactivationRound)
+      const lastActiveStakeUpdateRound = toString(t.lastActiveStakeUpdateRound)
       return {
-        active,
         address,
         feeShare,
         lastRewardRound,
-        pricePerSegment,
-        pendingRewardCut,
-        pendingFeeShare,
-        pendingPricePerSegment,
+        activationRound,
+        deactivationRound,
         rewardCut,
-        status,
         totalStake,
+        lastActiveStakeUpdateRound,
       }
     },
 
@@ -1486,7 +1469,7 @@ export async function createLivepeerSDK(
         targetBondingRate
         transcoderPoolMaxSize
         maxEarningsClaimsRounds
-      }
+     }
      */
     async getProtocol(): Promise<Protocol> {
       const paused = await rpc.getProtocolPaused()
@@ -1728,7 +1711,6 @@ export async function createLivepeerSDK(
       })
     },
 
-    // TODO: - check token balance
     async approveTokenBondAmount(
       amount: string,
       tx: TxObject,
@@ -1749,7 +1731,6 @@ export async function createLivepeerSDK(
       return await utils.getTxReceipt(txHash, config.eth)
     },
 
-    // TODO: check for existing approval / round initialization / token balance
     async bondApprovedTokenAmount(
       to: string,
       amount: string,
@@ -1929,6 +1910,7 @@ export async function createLivepeerSDK(
     /**
      * Withdraws earned token (Transfers a sender's delegator `bondedAmount` to their `tokenBalance`)
      * @memberof livepeer~rpc
+     * @param {int} [unbondlockId] - an int specifying the unbondlock id
      * @param {TxConfig} [tx = config.defaultTx] - an object specifying the `from` and `gas` values of the transaction
      * @return {TxReceipt}
      *
@@ -1956,19 +1938,14 @@ export async function createLivepeerSDK(
      * // }
      */
     async withdrawStake(
-      unbondingLockId: string,
+      unbondingLockId = null,
       tx = config.defaultTx,
     ): Promise<TxReceipt> {
-      const txHash = await BondingManager.withdrawStake(unbondingLockId, {
-        ...config.defaultTx,
-        ...tx,
-      })
-
-      if (tx.returnTxHash) {
-        return txHash
-      }
-
-      return await utils.getTxReceipt(txHash, config.eth)
+      let id = toBN(unbondingLockId)
+      return await utils.getTxReceipt(
+        await BondingManager.withdrawStake(toString(id), tx),
+        config.eth,
+      )
     },
 
     /**
@@ -2066,7 +2043,23 @@ export async function createLivepeerSDK(
       )
     },
   }
-  
+
+  return {
+    create: createLivepeerSDK,
+    config,
+    rpc,
+    utils,
+    events,
+    constants: {
+      ADDRESS_PAD,
+      EMPTY_ADDRESS,
+      DELEGATOR_STATUS,
+      TRANSCODER_STATUS,
+      VIDEO_PROFILE_ID_SIZE,
+      VIDEO_PROFILES,
+    },
+  }
+
   // Keeping typedefs down here so they show up last in the generated API table of contents
 
   /**

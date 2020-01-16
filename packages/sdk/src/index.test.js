@@ -78,11 +78,6 @@ test('should get unbonding period', async t => {
   t.true(string.isValidSync(res))
 })
 
-test('should get number active transcoders', async t => {
-  const res = await livepeer.rpc.getNumActiveTranscoders()
-  t.true(string.isValidSync(res))
-})
-
 test('should get maximum earning for claims rounds', async t => {
   const res = await livepeer.rpc.getMaxEarningsClaimsRounds()
   t.true(string.isValidSync(res))
@@ -213,19 +208,6 @@ test('should return object with correct shape from getBlock()', async t => {
   t.pass()
 })
 
-// Broadcaster
-
-test('should return object with correct shape from getBroadcaster()', async t => {
-  const schema = object({
-    deposit: string,
-    withdrawBlock: string,
-  })
-  const { from } = livepeer.config.defaultTx
-  const res = await livepeer.rpc.getBroadcaster(from)
-  schema.validateSync(res)
-  t.pass()
-})
-
 // Delgator
 
 test('should return object with correct shape from getDelegator()', async t => {
@@ -283,16 +265,14 @@ test('should return object with correct shape from getDelegatorUnbondingLocks()'
 
 test('should return object with correct shape from getTranscoder()', async t => {
   const schema = object({
-    active: boolean,
     address: string,
     feeShare: string, // %
     lastRewardRound: string,
-    pricePerSegment: string,
-    pendingRewardCut: string, // %
-    pendingFeeShare: string, // %
-    pendingPricePerSegment: string,
+    lastActiveStakeUpdateRound: string,
+    activationRound: string,
+    deactivationRound: string,
+    totalStake: string,
     rewardCut: string, // %
-    status: oneOf(livepeer.constants.TRANSCODER_STATUS),
   })
   const { from } = livepeer.config.defaultTx
   const res = await livepeer.rpc.getTranscoder(from)
@@ -313,41 +293,6 @@ test('should return object with correct shape from getCurrentRoundInfo()', async
   const { from } = livepeer.config.defaultTx
   const res = await livepeer.rpc.getCurrentRoundInfo(from)
   schema.validateSync(res)
-  t.pass()
-})
-
-test('should return number that signifies the estimated amount of gas to be used', async t => {
-  const cases = [
-    {
-      contractName: 'BondingManager',
-      methodName: 'maxEarningsClaimsRounds',
-      methodArgs: [],
-    },
-    {
-      contractName: 'LivepeerToken',
-      methodName: 'approve',
-      methodArgs: [livepeer.config.contracts.BondingManager.address, 10],
-    },
-    {
-      contractName: 'Minter',
-      methodName: 'currentMintedTokens',
-      methodArgs: [],
-    },
-    {
-      contractName: 'LivepeerToken',
-      methodName: 'mintingFinished',
-      methodArgs: [],
-    },
-  ]
-  for (const x of cases) {
-    const res = await livepeer.rpc.estimateGas(
-      x.contractName,
-      x.methodName,
-      x.methodArgs,
-    )
-    t.true(number.isValidSync(res))
-    t.true(res > 0)
-  }
   t.pass()
 })
 

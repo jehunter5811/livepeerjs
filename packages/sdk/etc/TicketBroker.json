@@ -245,6 +245,64 @@
       "type": "function"
     },
     {
+      "constant": true,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "faceValue",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "winProb",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "senderNonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "recipientRandHash",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "auxData",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct MTicketBrokerCore.Ticket",
+          "name": "_ticket",
+          "type": "tuple"
+        }
+      ],
+      "name": "getTicketHash",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
       "constant": false,
       "inputs": [],
       "name": "cancelUnlock",
